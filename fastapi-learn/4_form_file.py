@@ -5,9 +5,22 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-@app.post("/files/")
+@app.post("/file/")
 async def create_files(files: Annotated[list[bytes], File(description="Multiple files as bytes")]):
     return {"file_sizes": [len(file) for file in files]}
+
+@app.post("/files/")
+async def create_file(
+    file: Annotated[bytes, File()],
+    fileb: Annotated[UploadFile, File()],
+    token: Annotated[str, Form()],
+):
+    return {
+        "file_size": len(file),
+        "fileb_filename": fileb.filename,
+        "fileb_content_type": fileb.content_type,
+        "token": token,
+    }
 
 @app.post("/uploadfile/")
 async def create_upload_files(files: Annotated[list[UploadFile], File(description="Multiple files as UploadFile")]):

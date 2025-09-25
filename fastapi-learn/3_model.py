@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, EmailStr
 
+from typing import Union
+
 app = FastAPI()
 
 class UserBase(BaseModel):
@@ -30,3 +32,13 @@ def fake_save_user(user_in: UserIn):
 async def create_user(user_in: UserIn):
     user_saved = fake_save_user(user_in)
     return user_saved
+
+
+'''
+status codes:
+    100-199: information
+    200-299: success
+    300-399: redirection
+    400-499: client error
+    500-599: server error
+'''

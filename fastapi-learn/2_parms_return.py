@@ -18,7 +18,7 @@ items = {
     "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
 }
 
-@app.get("/items/{item_id}", response_model=Item, response_model_exclude={"name", "description"})
+@app.get("/items/{item_id}", response_model=Item, response_model_exclude={"name", "description"}) # a set
 async def read_item(item_id: str):
     return items[item_id]
 
