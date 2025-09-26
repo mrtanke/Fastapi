@@ -24,3 +24,12 @@ async def validation_handler(request: Request, exc: RequestValidationError):
         status_code=422,
         content={"detail": exc.errors(), "body": exc.body},
     )
+
+'''
+status codes:
+    100-199: information
+    200-299: success
+    300-399: redirection
+    400-499: client error
+    500-599: server error
+'''
