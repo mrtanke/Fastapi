@@ -27,9 +27,30 @@ async def validation_handler(request: Request, exc: RequestValidationError):
 
 '''
 status codes:
-    100-199: information
+    100-199: information  
     200-299: success
     300-399: redirection
-    400-499: client error
-    500-599: server error
+    400-499: client error (Controllable) - unlegal parameters, can't find, 
+    500-599: server error (Uncontrollable) - code bug, 1/0
+
+    async def get_res():
+    r = acquire()
+    try:
+        yield r
+    except HTTPException:
+        release(r)
+        raise                          # 保持原 HTTPException（通常 4xx/可控）
+    except ExternalError as e:
+        release(r)
+        raise HTTPException(502, "Upstream failed") from e
+    except Exception:
+        release(r)
+        raise                          # 普通/未知异常，交给兜底
+    finally:
+        ensure_close(r)
+
+异常来源分三类：
+- A：HTTPException（业务可预期、或你显式抛的 4xx/5xx）
+- B：ExternalError → 映射成 HTTPException(502)（下游故障）
+- C：其他 Exception（KeyError/ZeroDivisionError/... 未预期程序错）
 '''
