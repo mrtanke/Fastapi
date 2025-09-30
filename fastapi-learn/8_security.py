@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Body, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -45,6 +45,9 @@ class User(BaseModel):
 class UserInDB(User):
     hashed_password: str
 
+class RegisterForm(BaseModel):
+    username: str
+    password: str
 
 pwd_context = CryptContext(
     schemes=["bcrypt_sha256"],
@@ -118,8 +121,8 @@ async def get_current_active_user(
     return current_user
 
 
-@app.post("/token")
-async def login_for_access_token(
+@app.post("/login")
+async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
@@ -137,9 +140,9 @@ async def login_for_access_token(
 
 @app.post("/register")
 async def register(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    form_data: Annotated[RegisterForm, Body()],
 ) -> Token:
-    hashed_password = pwd_context.hash(form_data.password)
+    hashed_password = get_password_hash(form_data.password)
 
     fake_users_db[form_data.username] = {
         "username": form_data.username,
